@@ -1,0 +1,1 @@
+Result images are placed in this folder
