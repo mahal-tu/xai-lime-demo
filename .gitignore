@@ -1,1 +1,10 @@
 /lime-imgs/*.png
+/random-seed.txt
+/cls*.pkl
+/cases.csv
+/cases.php
+/faithfulness.csv
+/php/volumes
+/php/www/html/xai/cases.php
+/php/www/html/xai/lime-imgs/*.png
+/analysis/*.csv
