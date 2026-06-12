@@ -1,0 +1,25 @@
+services:
+ apache2:
+   build:
+     dockerfile_inline: |
+       FROM php:8-apache
+       RUN a2enmod rewrite
+       RUN docker-php-ext-install mysqli pdo_mysql
+   volumes:
+     - $PWD/www:/var/www
+   ports:
+     - "${LAMP_HTTPD_PORT:-127.0.0.1:8080}:80"
+ mariadb:
+   image: mariadb:11
+   volumes:
+     - $PWD/volumes/mysql:/var/lib/mysql
+   environment:
+     - MYSQL_DATABASE=${LAMP_MYSQL_DATABASE:-limetest}
+     - MYSQL_ROOT_PASSWORD=${LAMP_MYSQL_PASSWORD:-changeme}
+ phpmyadmin:
+   image: phpmyadmin
+   environment:
+     - PMA_HOST=mariadb
+     - PMA_PORT=3306
+   ports:
+     - "${LAMP_PHPMYADMIN_PORT:-127.0.0.1:8081}:80"

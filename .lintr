@@ -1,0 +1,7 @@
+linters: linters_with_defaults (
+    infix_spaces_linter = NULL,
+    indentation_linter(indent = 2L),
+    line_length_linter(length = 120L),
+    commented_code_linter = NULL,
+    spaces_left_parentheses_linter = NULL
+  )
