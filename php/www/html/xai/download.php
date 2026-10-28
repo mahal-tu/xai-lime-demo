@@ -191,7 +191,7 @@ if ($download_type === 'knowdata') {
     if ($target !== '' && $is_correct) {
       $sess_rows[$sessid][$target] = 1;
     } elseif ($target !== '' && !isset($sess_rows[$sessid][$target])) {
-      $sess_rows[$sessid][$target] = 0;
+      $sess_rows[$sessid][$target] = 0; // record explicit 0 only if data exists
     }
   }
 
@@ -204,7 +204,7 @@ if ($download_type === 'knowdata') {
   foreach ($sess_rows as $sessid => $target_values) {
     $out_row = [$sessid];
     foreach ($targets as $target) {
-      $out_row[] = $target_values[$target] ?? 0;
+      $out_row[] = $target_values[$target] ?? ''; // empty string for missing data
     }
     fputcsv($output, $out_row, ',', '"', '\\');
   }
@@ -237,7 +237,7 @@ if ($download_type === 'trials_wide') {
     if ($trial_id !== '' && $is_correct) {
       $sess_rows[$sessid][$trial_id] = 1;
     } elseif ($trial_id !== '' && !isset($sess_rows[$sessid][$trial_id])) {
-      $sess_rows[$sessid][$trial_id] = 0;
+      $sess_rows[$sessid][$trial_id] = 0; // record explicit 0 only if data exists
     }
   }
 
@@ -251,7 +251,7 @@ if ($download_type === 'trials_wide') {
   foreach ($sess_rows as $sessid => $trial_values) {
     $out_row = [$sessid];
     foreach ($trial_ids as $trial_id) {
-      $out_row[] = $trial_values[$trial_id] ?? 0;
+      $out_row[] = $trial_values[$trial_id] ?? ''; // empty string for missing data
     }
     fputcsv($output, $out_row, ',', '"', '\\');
   }
