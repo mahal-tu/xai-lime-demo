@@ -55,6 +55,20 @@ Halbrügge, M (2026). A New Paradigm for the Empirical Evaluation of the Underst
 
 ---
 
+# The Effect of Visual Similarity on the Comprehension of XAI visualizations
+
+## Data Analysis
+
+* `mnist-cluster.ipynb` creates prototypes (centroids) for the most typical writings of each MNIST digit
+* `skillset2026.ipynb` computes the correlation-based similarity of the masked images and the digit prototypes
+* `analysis.R` has been augmented with estimating the effect of visual similarity to the prototypes
+
+## Publication
+
+Halbrügge, M (2026). Does AI Literacy Improve the Comprehension of XAI Visualizations? A Case Study. In _ICODSIP 3rd International conference on digital skills, IT professionalism and informatics education_, Berlin, Germany
+
+---
+
 # General Introduction To LIME
 
 Based on Local Interpretable Model-agnostic Explanations (LIME)

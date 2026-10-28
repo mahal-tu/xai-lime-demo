@@ -4,6 +4,7 @@
 /cases.csv
 /cases.php
 /faithfulness.csv
+/centroids.csv.bz2
 /php/volumes
 /php/www/html/xai/cases.php
 /php/www/html/xai/lime-imgs/*.png

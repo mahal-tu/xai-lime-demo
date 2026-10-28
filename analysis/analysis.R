@@ -257,3 +257,74 @@ ggplot(lr, aes(x=trial_id, y=leftright)) +
   theme(axis.text.x = element_text(angle = 90))
 ggplot(lr, aes(x=leftright)) + geom_histogram(bins=21) + xlim(0, 1)
 
+
+###################################################################################################
+# get visual similarity (correlation on pixel level)
+
+faith <- read.csv("../faithfulness.csv", header=TRUE, row.names=1)
+faith$trial_id <- paste(faith$case, faith$idx, sep="#")
+
+# which is better? Diff of Fisher-z-transformed correlations with centroids
+faith$c1_zcorr = atanh(faith$c1_corr)
+faith$c2_zcorr = atanh(faith$c2_corr)
+faith$corr_z_diff = faith$c1_zcorr - faith$c2_zcorr
+summary(faith$corr_z_diff)
+mean(faith$corr_z_diff)
+sd(faith$corr_z_diff)
+ggplot(faith, aes(x=corr_z_diff)) + geom_histogram(binwidth=.1)
+# looks like there is a strong correlation to the case type
+ggplot(faith, aes(x=case, y=corr_z_diff)) + geom_boxplot()
+ggplot(faith, aes(x=c1_correct, y=c1_zcorr)) + geom_boxplot()
+ggplot(faith, aes(x=c1_correct, y=corr_z_diff)) + geom_boxplot()
+ggplot(faith, aes(x=c2_correct, y=corr_z_diff)) + geom_boxplot()
+
+###################################################################################################
+# correctness per trial compared to faithfulness
+
+(tr_difficulty <- aggregate(correct ~ trial_id, trials_long, mean))
+tr_difficulty <- merge(tr_difficulty, faith, by="trial_id")
+str(tr_difficulty)
+tr_difficulty[,c("trial_id","ground","correct","corr_z_diff")]
+
+cor(tr_difficulty$correct, tr_difficulty$c1_zcorr, method="pearson", use="pairwise")
+cor(tr_difficulty$correct, tr_difficulty$c2_zcorr, method="pearson", use="pairwise")
+cor(tr_difficulty$correct, tr_difficulty$corr_z_diff, method="pearson", use="pairwise")
+ggplot(tr_difficulty, aes(x=corr_z_diff, y=correct, color=c1_correct)) +
+  geom_point() +
+  geom_hline(yintercept=.5, linetype="dotted") + geom_vline(xintercept=0, linetype="dotted")
+
+ggplot(tr_difficulty, aes(x=corr_z_diff, y=correct, color=c1_correct, label=trial_id)) +
+  geom_point() + geom_text(vjust = 0, nudge_y = 0.01)
+
+tr_difficulty[tr_difficulty$trial_id=="baba#15633",c("trial_id","correct","corr_z_diff")]
+tr_difficulty[tr_difficulty$trial_id=="baab#29646",c("trial_id","correct","corr_z_diff")]
+
+# TODO: hierarchical analysis?
+summary(lm(correct ~ c1_zcorr + c2_zcorr, tr_difficulty))
+
+# Odds have much more predictive power!
+cor(tr_difficulty$correct, log(tr_difficulty$c1_ground_odds), method="pearson", use="pairwise")
+cor(tr_difficulty$correct, log(tr_difficulty$c1_faith_odds), method="pearson", use="pairwise")
+
+# difference is strongly connected to whether c1 is correct or not!
+etasq(lm(corr_z_diff ~ c1_correct + c2_correct, tr_difficulty))
+
+###################################################################################################
+# use faith odds as predictor in gmler
+
+long_faith <- merge(trials_long, faith, by="trial_id")
+
+m0 <- glmer(correct ~ (1|sessid) + (1|session_order), family = binomial, long_faith)
+r.squaredGLMM(m0)
+
+summary(m11 <- glmer(correct ~ corr_z_diff + (1|sessid) + (1|session_order), family = binomial, long_faith))
+exp(fixef(m11))
+r.squaredGLMM(m11, m0)
+
+summary(m13 <- glmer(correct ~ c1_correct + c2_correct + (1|sessid) + (1|session_order), family = binomial, long_faith))
+exp(fixef(m13))
+r.squaredGLMM(m13, m0)
+
+summary(m14 <- glmer(correct ~ c1_correct + c2_correct + corr_z_diff + (1|sessid) + (1|session_order), family = binomial, long_faith))
+exp(fixef(m14))
+r.squaredGLMM(m14, m0)
